@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Downloads · {{ app_name }}{% endblock %}
+{% block nav %}
+  <a href="{{ url_for('index') }}" {% if request.endpoint == 'index' %}class="active"{% endif %}>Downloads</a>
+  <a href="{{ url_for('api_health') }}">Health</a>
+{% endblock %}
+{% block content %}
+<h1 style="font-size:20px;margin-bottom:12px">Download queue</h1>
+
+<div class="card">
+<form method="post" action="{{ url_for('create_task_form') }}">
+  <div class="row">
+    <label for="urls">Share URLs (one per line)</label>
+  </div>
+  <div class="row" style="margin:6px 0 10px">
+    <textarea id="urls" name="urls" rows="4" style="flex:1;min-width:280px"
+              placeholder="https://ctfile.example.com/f/12345">{{ form.urls or '' }}</textarea>
+  </div>
+  <div class="row">
+    <label for="parallel">Parallel</label>
+    <input id="parallel" name="parallel" type="number" min="1" max="{{ max_parallel }}"
+           value="{{ form.parallel or 4 }}" style="width:80px">
+    <button class="btn" type="submit">Queue downloads</button>
+    <span class="empty">max {{ max_parallel }} in flight per task</span>
+  </div>
+</form>
+</div>
+
+<div class="card">
+<h2>Tasks</h2>
+{% if tasks %}
+<table>
+<tr><th>id</th><th>status</th><th>files</th><th>got / want</th><th>parallel</th><th>created</th><th></th></tr>
+{% for row in tasks %}
+<tr>
+  <td class="mono"><a href="{{ url_for('task_detail', tid=row.t.id) }}" style="color:var(--accent);text-decoration:none">{{ row.t.id }}</a></td>
+  <td><span class="tag {% if row.t.status == 'done' %}g{% elif row.t.status == 'failed' %}r{% else %}y{% endif %}">{{ row.t.status }}</span></td>
+  <td>{{ row.done }}/{{ row.files|length }}{% if row.failed %} <span class="tag r">{{ row.failed }} failed</span>{% endif %}</td>
+  <td class="mono">{{ row.got|human }} / {{ row.want|human }}</td>
+  <td class="mono">{{ row.t.parallel }}</td>
+  <td class="mono">{{ row.t.created_at }}</td>
+  <td><form method="post" action="{{ url_for('delete_task', tid=row.t.id) }}"><button class="btn r" type="submit">Delete</button></form></td>
+</tr>
+{% for f in row.files[:3] %}
+<tr>
+  <td></td>
+  <td class="mono" colspan="2">{{ f.name }} <span class="tag">{{ f.status }}</span></td>
+  <td colspan="4"><div class="bar"><i style="width:{{ (f.downloaded / f.size * 100) if f.size else 0 }}%"></i></div></td>
+</tr>
+{% endfor %}
+{% endfor %}
+</table>
+{% else %}
+<p class="empty">Nothing queued yet — paste share URLs above to start a task.</p>
+{% endif %}
+</div>
+
+<div class="card">
+<h2>Registered HTTP routes</h2>
+<table>
+<tr><th>rule</th><th>methods</th><th>endpoint</th></tr>
+{% for r in routes %}
+<tr><td class="mono">{{ r.rule }}</td><td class="mono">{{ r.methods }}</td><td class="mono">{{ r.endpoint }}</td></tr>
+{% endfor %}
+</table>
+</div>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Not found · {{ app_name }}{% endblock %}
+{% block nav %}<a href="{{ url_for('index') }}">Downloads</a>{% endblock %}
+{% block content %}
+<div class="card">
+<h2>404 — no such {{ missing }}</h2>
+<p class="empty">Nothing is queued under that id. <a href="{{ url_for('index') }}" style="color:var(--accent)">Back to the queue</a>.</p>
+</div>
+{% endblock %}

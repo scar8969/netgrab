@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Task {{ task.id }} · {{ app_name }}{% endblock %}
+{% block nav %}
+  <a href="{{ url_for('index') }}">Downloads</a>
+  <a href="{{ url_for('task_detail', tid=task.id) }}" class="active">Task {{ task.id }}</a>
+{% endblock %}
+{% block navright %}<a class="btn g" href="{{ url_for('index') }}">Back</a>{% endblock %}
+{% block content %}
+<h1 style="font-size:20px;margin-bottom:12px">Task {{ task.id }}</h1>
+
+<div class="card"><div class="row">
+  <span class="stat"><b><span class="tag {% if task.status == 'done' %}g{% elif task.status == 'failed' %}r{% else %}y{% endif %}">{{ task.status }}</span></b><span>status</span></span>
+  <span class="stat"><b>{{ done }}/{{ files|length }}</b><span>files done</span></span>
+  <span class="stat"><b class="mono">{{ got|human }}</b><span>downloaded</span></span>
+  <span class="stat"><b class="mono">{{ want|human }}</b><span>total known</span></span>
+  <span class="stat"><b>{{ task.parallel }}</b><span>parallel</span></span>
+</div>
+<div class="bar" style="margin-top:10px"><i style="width:{{ (got / want * 100) if want else 0 }}%"></i></div>
+<div class="row" style="margin-top:12px">
+  <form method="post" action="{{ url_for('set_status', tid=task.id, state='paused') }}"><button class="btn g" type="submit">Pause</button></form>
+  <form method="post" action="{{ url_for('set_status', tid=task.id, state='running') }}"><button class="btn grn" type="submit">Resume</button></form>
+  <form method="post" action="{{ url_for('delete_task', tid=task.id) }}"><button class="btn r" type="submit">Delete task</button></form>
+</div>
+</div>
+
+<div class="card">
+<h2>Files</h2>
+{% if files %}
+<table>
+<tr><th>id</th><th>name</th><th>url</th><th>status</th><th>progress</th><th>retries</th><th></th></tr>
+{% for f in files %}
+<tr>
+  <td class="mono">{{ f.id }}</td>
+  <td class="mono">{{ f.name }}</td>
+  <td class="mono">{{ f.url }}</td>
+  <td><span class="tag {% if f.status == 'done' %}g{% elif f.status == 'failed' %}r{% else %}y{% endif %}">{{ f.status }}</span></td>
+  <td style="min-width:140px"><div class="bar"><i style="width:{{ (progress(f) * 100)|round(1) }}%"></i></div>
+      <span class="mono">{{ (progress(f) * 100)|round(1) }}% · {{ f.downloaded|human }} / {{ f.size|human }}</span></td>
+  <td class="mono">{{ f.retries }}</td>
+  <td><form method="post" action="{{ url_for('retry_file', tid=task.id, fid=f.id) }}"><button class="btn g" type="submit">Retry</button></form></td>
+</tr>
+{% endfor %}
+</table>
+{% else %}
+<p class="empty">This task has no files.</p>
+{% endif %}
+</div>
+{% endblock %}
