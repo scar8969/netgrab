@@ -3,13 +3,13 @@ requires = ["setuptools>=69", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "a7-ctfile-downloader"
+name = "netgrab"
 version = "0.1.0"
-description = "A7 ctfile-downloader skeleton — batch downloader."
+description = "Batch download manager: queue URLs, pause and resume tasks, and track per-task progress and byte counts."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
-authors = [{ name = "project-skeletons maintainers" }]
+authors = [{ name = "Priyanshu Rout" }]
 keywords = ["flask", "service", "ctfile_downloader"]
 classifiers = [
   "Development Status :: 4 - Beta",
@@ -48,7 +48,7 @@ Documentation = "https://example.invalid/ctfile_downloader/docs"
 Issues = "https://example.invalid/ctfile_downloader/issues"
 
 [project.scripts]
-a7-ctfile-downloader = "ctfile_downloader.cli:main"
+netgrab = "ctfile_downloader.cli:main"
 
 [tool.setuptools]
 package-dir = { "" = "src" }

@@ -1,6 +1,6 @@
 # Architecture -- Ctfile_downloader
 
-A7 ctfile-downloader skeleton — batch downloader.
+A7 ctfile-downloader service — batch downloader.
 
 This document explains how the service is put together, why the seams sit where
 they do, and what breaks first under load.
@@ -9,7 +9,7 @@ they do, and what breaks first under load.
 
 ## 1. Context
 
-a7_ctfile_downloader is a single-process Flask service. It owns its own database (SQLite by
+netgrab is a single-process Flask service. It owns its own database (SQLite by
 default, any SQLAlchemy-supported backend via `DATABASE_URL`) and is deployed
 behind a reverse proxy or an orchestrator.
 
@@ -74,7 +74,7 @@ flowchart TB
 | `templates/base.html` | asset |
 | `templates/index.html` | asset |
 | `templates/task.html` | asset |
-| `tests/test_a7_ctfile_downloader.py` | module |
+| `tests/test_netgrab.py` | module |
 | `_app.py` | asset |
 
 ---
@@ -137,8 +137,8 @@ writable lives under `/app`.
 
 | Table | Owner |
 | --- | --- |
-| `tasks` | owned by `a7_ctfile_downloader` |
-| `files` | owned by `a7_ctfile_downloader` |
+| `tasks` | owned by `netgrab` |
+| `files` | owned by `netgrab` |
 
 Tables are created by the application's own bootstrap on first use. No migration
 tool is wired in; the schema is additive, and the service tolerates a missing or

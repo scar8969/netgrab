@@ -34,7 +34,7 @@ RUN groupadd --system --gid 1001 app \
 WORKDIR /app
 
 COPY --from=builder /wheels /wheels
-RUN python -m pip install --no-cache-dir --no-index --find-links=/wheels a7-ctfile-downloader \
+RUN python -m pip install --no-cache-dir --no-index --find-links=/wheels netgrab \
  && rm -rf /wheels \
  && mkdir -p /var/lib/ctfile_downloader/instance /var/lib/ctfile_downloader/log \
  && chown -R app:app /var/lib/ctfile_downloader /app

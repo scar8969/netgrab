@@ -1,4 +1,4 @@
-"""A7 ctfile-downloader — tests.  Run: pytest test_a7_ctfile_downloader.py
+"""A7 ctfile-downloader — tests.  Run: pytest test_netgrab.py
 
 The suite runs hermetically: the download tests drive DownloadWorker with an
 in-process fake aiohttp session, and pass the destination path *explicitly* so
