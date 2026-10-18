@@ -9,7 +9,6 @@ paths:
       responses:
         "200":
           description: ok
-  /api/tasks:
     get:
       summary: list
       responses:

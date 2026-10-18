@@ -66,6 +66,7 @@ Every route below is in [`openapi/netgrab.yaml`](openapi/netgrab.yaml) and is ex
 | Method | Path | What it does |
 | --- | --- | --- |
 | `GET` | `/api/tasks` | list |
+| `POST` | `/api/tasks` | create task |
 | `POST` | `/api/tasks/<id>/pause` | pause |
 | `POST` | `/api/tasks/<id>/resume` | resume |
 
@@ -99,7 +100,7 @@ These numbers were produced on this checkout by `pytest --cov` and by booting `w
 
 | Signal | Value |
 | --- | --- |
-| Tests | **25 / 25 passed** (3.5 s, exit 0) |
+| Tests | **25 / 25 passed** (2.5 s, exit 0) |
 | Line coverage | **63.7%** — 441 of 652 statements |
 | Source | 15 files / 1,430 lines |
 | Test code | 4 files / 346 lines |
