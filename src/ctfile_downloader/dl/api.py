@@ -1,10 +1,11 @@
-from .worker import DownloadWorker
-from ..models import File, Task, db
-
 from flask import Blueprint, jsonify, request
+
+from ..models import File, Task, db
+from .worker import DownloadWorker
 
 bp = Blueprint("dl", __name__)
 _workers = {}
+
 
 @bp.post("/api/tasks")
 def create_task():
@@ -20,8 +21,10 @@ def create_task():
     db.session.commit()
     # start worker thread
     import threading
+
     threading.Thread(target=_run_task, args=(task.id,), daemon=True).start()
     return jsonify({"task_id": task.id, "status": "queued"})
+
 
 def _run_task(task_id):
     """Resolve files, download them one by one, and record each outcome.
@@ -30,6 +33,7 @@ def _run_task(task_id):
     emits a LegacyAPIWarning on every call.
     """
     import asyncio
+
     task = db.session.get(Task, task_id)
     if task is None:
         return
@@ -50,13 +54,30 @@ def _run_task(task_id):
     task.status = "done"
     db.session.commit()
 
+
 @bp.get("/api/tasks")
 def list_tasks():
-    return jsonify({"tasks": [{"id": t.id, "status": t.status, "parallel": t.parallel,
-                               "files": [{"name": f.name, "status": f.status,
-                                          "progress": f.downloaded / f.size if f.size else 0}
-                                         for f in File.query.filter_by(task_id=t.id).all()]}
-                              for t in Task.query.order_by(Task.id.desc()).limit(20).all()]})
+    return jsonify(
+        {
+            "tasks": [
+                {
+                    "id": t.id,
+                    "status": t.status,
+                    "parallel": t.parallel,
+                    "files": [
+                        {
+                            "name": f.name,
+                            "status": f.status,
+                            "progress": f.downloaded / f.size if f.size else 0,
+                        }
+                        for f in File.query.filter_by(task_id=t.id).all()
+                    ],
+                }
+                for t in Task.query.order_by(Task.id.desc()).limit(20).all()
+            ]
+        }
+    )
+
 
 @bp.post("/api/tasks/<int:tid>/pause")
 def pause(tid):
@@ -64,6 +85,7 @@ def pause(tid):
     t.status = "paused"
     db.session.commit()
     return jsonify({"status": "paused"})
+
 
 @bp.post("/api/tasks/<int:tid>/resume")
 def resume(tid):

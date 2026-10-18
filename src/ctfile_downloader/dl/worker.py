@@ -1,4 +1,8 @@
-import aiohttp, asyncio, os
+import asyncio
+import os
+
+import aiohttp
+
 
 class DownloadWorker:
     def __init__(self, out_dir: str = "./downloads", speed_limit: int = 0):
@@ -10,16 +14,15 @@ class DownloadWorker:
         part = dest_path + ".part"
         offset = os.path.getsize(part) if resume and os.path.exists(part) else 0
         headers = {"Range": f"bytes={offset}-"} if offset else {}
-        async with aiohttp.ClientSession() as sess:
-            async with sess.get(url, headers=headers) as r:
-                if r.status not in (200, 206):
-                    raise RuntimeError(f"HTTP {r.status}")
-                mode = "ab" if offset else "wb"
-                with open(part, mode) as f:
-                    async for chunk in r.content.iter_chunked(65536):
-                        f.write(chunk)
-                        if self.speed_limit:
-                            await asyncio.sleep(len(chunk) / self.speed_limit)
+        async with aiohttp.ClientSession() as sess, sess.get(url, headers=headers) as r:
+            if r.status not in (200, 206):
+                raise RuntimeError(f"HTTP {r.status}")
+            mode = "ab" if offset else "wb"
+            with open(part, mode) as f:
+                async for chunk in r.content.iter_chunked(65536):
+                    f.write(chunk)
+                    if self.speed_limit:
+                        await asyncio.sleep(len(chunk) / self.speed_limit)
         os.rename(part, dest_path)
 
     def progress(self, file):

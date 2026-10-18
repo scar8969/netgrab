@@ -5,22 +5,24 @@ package directory (web/); the templates live in the project root one level up.
 The path below is absolute and derived from this module's own file so the
 lookup does not depend on the process working directory.
 """
+
 import os
 
 from flask import Flask, flash, jsonify, redirect, render_template, request, url_for
 
+from . import paths
 from .dl.api import bp
 from .models import File, Task, db
-from . import paths
 
 APP_NAME = "⬇ ctfile-downloader"
 MAX_PARALLEL = 16
 
+
 def build_app():
     """Build the application: configuration, database, then routes."""
-    app = Flask(__name__,
-                template_folder=str(paths.TEMPLATES_DIR),
-                instance_path=str(paths.INSTANCE_DIR))
+    app = Flask(
+        __name__, template_folder=str(paths.TEMPLATES_DIR), instance_path=str(paths.INSTANCE_DIR)
+    )
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + str(paths.INSTANCE_DIR / "ctfile.db")
     db.init_app(app)
     with app.app_context():
@@ -41,11 +43,16 @@ def build_app():
         rows = []
         for t in Task.query.order_by(Task.id.desc()).limit(limit).all():
             files = _files(t.id)
-            rows.append({"t": t, "files": files,
-                         "done": sum(1 for f in files if f.status == "done"),
-                         "failed": sum(1 for f in files if f.status == "failed"),
-                         "got": sum(f.downloaded or 0 for f in files),
-                         "want": sum(f.size or 0 for f in files)})
+            rows.append(
+                {
+                    "t": t,
+                    "files": files,
+                    "done": sum(1 for f in files if f.status == "done"),
+                    "failed": sum(1 for f in files if f.status == "failed"),
+                    "got": sum(f.downloaded or 0 for f in files),
+                    "want": sum(f.size or 0 for f in files),
+                }
+            )
         return rows
 
     @app.template_filter("human")
@@ -67,19 +74,22 @@ def build_app():
         been attempted yet, so `form` must always be defined -- an Undefined there
         is a 500 on the landing page.
         """
-        ctx = {"app_name": APP_NAME,
-               "form": extra.pop("form", {}),
-               "task_count": Task.query.count(),
-               "file_count": File.query.count(),
-               "done_count": File.query.filter_by(status="done").count(),
-               "max_parallel": MAX_PARALLEL}
+        ctx = {
+            "app_name": APP_NAME,
+            "form": extra.pop("form", {}),
+            "task_count": Task.query.count(),
+            "file_count": File.query.count(),
+            "done_count": File.query.filter_by(status="done").count(),
+            "max_parallel": MAX_PARALLEL,
+        }
         ctx.update(extra)
         return ctx
 
     @app.get("/")
     def index():
-        return render_template("index.html", tasks=_task_rows(), routes=_app_routes(),
-                               **_page_context())
+        return render_template(
+            "index.html", tasks=_task_rows(), routes=_app_routes(), **_page_context()
+        )
 
     @app.post("/tasks")
     def create_task_form():
@@ -96,14 +106,20 @@ def build_app():
         if errors:
             for msg in errors:
                 flash(msg, "error")
-            return render_template("index.html", tasks=_task_rows(),
-                                   form={"urls": raw, "parallel": parallel_raw},
-                                   routes=_app_routes(), **_page_context()), 400
+            return render_template(
+                "index.html",
+                tasks=_task_rows(),
+                form={"urls": raw, "parallel": parallel_raw},
+                routes=_app_routes(),
+                **_page_context(),
+            ), 400
         task = Task(parallel=parallel, status="queued")
         db.session.add(task)
         db.session.flush()
         for u in urls:
-            db.session.add(File(task_id=task.id, url=u, name=u.rstrip("/").split("/")[-1] or "download"))
+            db.session.add(
+                File(task_id=task.id, url=u, name=u.rstrip("/").split("/")[-1] or "download")
+            )
         db.session.commit()
         flash("queued %d file(s) in task %d" % (len(urls), task.id), "success")
         return redirect(url_for("task_detail", tid=task.id))
@@ -114,11 +130,16 @@ def build_app():
         if t is None:
             return render_template("404.html", missing="task %d" % tid, **_page_context()), 404
         files = _files(t.id)
-        return render_template("task.html", task=t, files=files,
-                               done=sum(1 for f in files if f.status == "done"),
-                               got=sum(f.downloaded or 0 for f in files),
-                               want=sum(f.size or 0 for f in files),
-                               progress=_progress, **_page_context())
+        return render_template(
+            "task.html",
+            task=t,
+            files=files,
+            done=sum(1 for f in files if f.status == "done"),
+            got=sum(f.downloaded or 0 for f in files),
+            want=sum(f.size or 0 for f in files),
+            progress=_progress,
+            **_page_context(),
+        )
 
     @app.post("/tasks/<int:tid>/status/<state>")
     def set_status(tid, state):
@@ -161,24 +182,30 @@ def build_app():
 
     @app.get("/api/health")
     def api_health():
-        return jsonify({"status": "ok",
-                        "tasks": Task.query.count(),
-                        "files": File.query.count(),
-                        "done": File.query.filter_by(status="done").count(),
-                        "failed": File.query.filter_by(status="failed").count(),
-                        "bytes": sum(f.downloaded or 0 for f in File.query.all())})
+        return jsonify(
+            {
+                "status": "ok",
+                "tasks": Task.query.count(),
+                "files": File.query.count(),
+                "done": File.query.filter_by(status="done").count(),
+                "failed": File.query.filter_by(status="failed").count(),
+                "bytes": sum(f.downloaded or 0 for f in File.query.all()),
+            }
+        )
 
     def _app_routes():
         rows = []
         for rule in sorted(app.url_map.iter_rules(), key=lambda r: str(r)):
             methods = sorted(m for m in rule.methods if m in ("GET", "POST"))
-            rows.append({"rule": str(rule), "endpoint": rule.endpoint,
-                         "methods": ", ".join(methods)})
+            rows.append(
+                {"rule": str(rule), "endpoint": rule.endpoint, "methods": ", ".join(methods)}
+            )
         return rows
 
     if __name__ == "__main__":
         app.run(host="0.0.0.0", port=int(os.environ.get("PORT", "8000")))
 
     return app
+
 
 app = build_app()

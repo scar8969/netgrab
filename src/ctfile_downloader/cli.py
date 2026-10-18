@@ -1,6 +1,8 @@
 import argparse
 import asyncio
+
 from . import paths
+
 
 def cmd_dl(args):
     """Download every URL listed in a local link file, one at a time.
@@ -22,11 +24,12 @@ def cmd_dl(args):
         print("[ctfile] %s" % name)
         try:
             asyncio.run(worker.download(url, name))
-        except Exception as exc:  # noqa: BLE001 - one bad link must not stop the batch
+        except Exception as exc:
             failed += 1
             print("[ctfile] failed %s: %s" % (name, exc))
     print("[ctfile] done: %d/%d files" % (len(urls) - failed, len(urls)))
     return 1 if failed else 0
+
 
 def main():
     p = argparse.ArgumentParser(prog="ctfile-dl")

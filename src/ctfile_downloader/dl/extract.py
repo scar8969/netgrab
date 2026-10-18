@@ -1,4 +1,6 @@
-import re, json, urllib.request
+import re
+import urllib.request
+
 
 def extract_links(share_url: str) -> list:
     """Parse ctfile share page: find file ids in JS config, build direct URLs."""

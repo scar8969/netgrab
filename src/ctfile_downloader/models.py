@@ -1,7 +1,9 @@
 from datetime import datetime
+
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
+
 
 class Task(db.Model):
     __tablename__ = "tasks"
@@ -9,6 +11,7 @@ class Task(db.Model):
     status = db.Column(db.String(16), default="queued")  # queued|running|paused|done|failed
     parallel = db.Column(db.Integer, default=4)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 class File(db.Model):
     __tablename__ = "files"
