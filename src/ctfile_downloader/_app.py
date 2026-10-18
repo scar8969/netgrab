@@ -196,7 +196,7 @@ def build_app():
     def _app_routes():
         rows = []
         for rule in sorted(app.url_map.iter_rules(), key=lambda r: str(r)):
-            methods = sorted(m for m in rule.methods if m in ("GET", "POST"))
+            methods = sorted(m for m in (rule.methods or set()) if m in ("GET", "POST"))
             rows.append(
                 {"rule": str(rule), "endpoint": rule.endpoint, "methods": ", ".join(methods)}
             )

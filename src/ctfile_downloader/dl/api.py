@@ -1,10 +1,12 @@
+from typing import Any
+
 from flask import Blueprint, jsonify, request
 
 from ..models import File, Task, db
 from .worker import DownloadWorker
 
 bp = Blueprint("dl", __name__)
-_workers = {}
+_workers: dict[str, Any] = {}
 
 
 @bp.post("/api/tasks")
