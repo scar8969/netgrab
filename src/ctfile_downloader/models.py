@@ -1,6 +1,6 @@
-from datetime import datetime
-
 from flask_sqlalchemy import SQLAlchemy
+
+from .clock import utcnow
 
 db = SQLAlchemy()
 
@@ -10,7 +10,7 @@ class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     status = db.Column(db.String(16), default="queued")  # queued|running|paused|done|failed
     parallel = db.Column(db.Integer, default=4)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=utcnow)
 
 
 class File(db.Model):

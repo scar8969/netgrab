@@ -126,7 +126,7 @@ Produced on this checkout by `pytest --cov` and by booting `wsgi.py` and issuing
 | --- | --- |
 | Tests | **25 / 25 passed** (2.5 s, exit 0) |
 | Line coverage | **63.7%** — 441 of 652 statements |
-| Source | 15 files / 1,431 lines |
+| Source | 15 files / 1,449 lines |
 | Test code | 4 files / 346 lines |
 | Documented paths | 3 in the spec, 1 GET |
 | Live probe | 9 GET requests to the booted app, **8 answered 200** |
@@ -169,7 +169,7 @@ netgrab/
 │   ├── cli.py                           51  
 │   ├── dl/worker.py                     30  
 │   ├── models.py                        26  
-│   ├── dl/extract.py                    13  
+│   ├── clock.py                         18  Naive UTC timestamps
 ├── openapi/netgrab.yaml                   the contract of record
 ├── schema/netgrab.sql                     the DDL
 ├── tests/                       the suite that has to stay green
