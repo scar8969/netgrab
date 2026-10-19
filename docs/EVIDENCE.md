@@ -4,7 +4,7 @@ Every line below was produced by a command run against this exact checkout, on t
 
 | | |
 | --- | --- |
-| Generated | 2026-10-19 02:56 |
+| Generated | 2026-10-19 09:39 |
 | Python | 3.14.7 |
 | Platform | Windows 11 |
 
@@ -15,7 +15,7 @@ python -m pytest -q
 ```
 
 - exit code **0**
-- 25 passed in 1.85s
+- 25 passed in 1.67s
 
 ## Static gates
 
@@ -35,6 +35,19 @@ The application was imported through `wsgi.py` and each GET path declared in `op
 | 200 | `/api/tasks` | 13 | application/json |
 
 1 paths walked, 0 of them raised or answered 5xx.
+
+## CLI
+
+```
+usage: ctfile-dl [-h] {dl} ...
+
+positional arguments:
+  {dl}
+    dl        download every URL in a link file
+
+options:
+  -h, --help  show this help message and exit
+```
 
 ## Screenshots
 
